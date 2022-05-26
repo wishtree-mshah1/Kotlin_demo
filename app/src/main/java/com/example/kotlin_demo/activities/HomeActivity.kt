@@ -15,14 +15,20 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlin_demo.R
-import com.example.kotlin_demo.network.UserDao
+import com.example.kotlin_demo.data.UserDao
 import com.example.kotlin_demo.adapters.MyAdapter
+import com.example.kotlin_demo.data.ApiDatabase
 import com.example.kotlin_demo.interfaces.ApiInterface
-import com.example.kotlin_demo.models.MyDataItem
-import com.example.kotlin_demo.models.User
+import com.example.kotlin_demo.data.MyDataItem
+import com.example.kotlin_demo.data.User
+import com.example.kotlin_demo.repo.APiDataRepository
+import com.example.kotlin_demo.viewmodels.ApiDataVMFactory
+import com.example.kotlin_demo.viewmodels.ApiDataViewModels
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,8 +46,10 @@ class HomeActivity : AppCompatActivity() {
 
     private  lateinit var welcomeMess: TextView
     private lateinit var auth: FirebaseAuth
-    lateinit var myAdapter: MyAdapter
+//    lateinit var myAdapter: MyAdapter
     lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var apiDataViewModels: ApiDataViewModels
+    var allData = ArrayList<MyDataItem>()
 
     companion object {
         private const val STORAGE_PERMISSION_CODE = 101
@@ -58,20 +66,40 @@ class HomeActivity : AppCompatActivity() {
 
         showDetails()
 
-        var recycler = findViewById<RecyclerView>(R.id.recyclerview_users)
+        var recyclerview_users = findViewById<RecyclerView>(R.id.recyclerview_users)
+        recyclerview_users.layoutManager= LinearLayoutManager(this)
+        val adapter = MyAdapter(this)
+        recyclerview_users.adapter = adapter
+
+
+      /*  var recycler = findViewById<RecyclerView>(R.id.recyclerview_users)
         recycler.setHasFixedSize(true)
         linearLayoutManager = LinearLayoutManager(this)
-        recycler.layoutManager = linearLayoutManager
+        recycler.layoutManager = linearLayoutManager*/
 
         doNetworkCalls()
+/*
+        checkApiCalling()
+*/
 
-        
+        val dao = ApiDatabase.getDatabase(applicationContext).getApiDataDao()
+        val repository = APiDataRepository(dao)
+        apiDataViewModels = ViewModelProvider(this,ApiDataVMFactory(repository)).get(ApiDataViewModels::class.java)
+        apiDataViewModels.allData.observe(this, Observer {
+            adapter.updateData(it)
+        })
     }
 
     private fun showDetails() {
-        UserDao().getUserbyId(auth.currentUser?.uid.toString()).addOnCompleteListener {
-            val currentUser= it.result?.toObject(User::class.java)
-            welcomeMess.text="Welcome ${currentUser?.name}"
+        try {
+            UserDao().getUserbyId(auth.currentUser?.uid.toString()).addOnCompleteListener {
+                //val currentUser= it.result?.toObject(User::class.java)
+                //welcomeMess.text="Welcome ${currentUser?.name}"
+            }
+        }
+        catch (e:Exception){
+            println("!!!!!!!!!!!!!!!!!!!!!!!!")
+            println(e)
         }
     }
 
@@ -117,6 +145,17 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    /*private fun checkApiCalling(){
+        if(checkForInternet(baseContext) == false){
+            if (allData.size == 0){
+
+                doNetworkCalls()
+            }
+        }
+        else{
+            println("successfull")
+        }
+    }*/
     private fun doNetworkCalls(){
         try {
             CoroutineScope(Dispatchers.IO).launch {
@@ -137,10 +176,26 @@ class HomeActivity : AppCompatActivity() {
                         ) {
                             //!! for a not null
                             val responseBody = response.body()!!
-                            myAdapter = MyAdapter(baseContext, responseBody)
+
+                            for (i in 0..responseBody.size-1){
+                                println(responseBody[i].body)
+                                println(responseBody[i].id)
+                                println(responseBody[i].title)
+                                println(responseBody[i].userId)
+
+                                apiDataViewModels.insertData(MyDataItem(responseBody[i].body,responseBody[i].id,responseBody[i].title,responseBody[i].userId))
+
+                            }
+
+                            println("////////////////////////////////////")
+                            println(responseBody[1].body)
+                            println(responseBody.size)
+                            println("////////////////////////////////////")
+
+                            /*myAdapter = MyAdapter(baseContext, responseBody)
                             myAdapter.notifyDataSetChanged()
                             var recycler = findViewById<RecyclerView>(R.id.recyclerview_users)
-                            recycler.adapter = myAdapter
+                            recycler.adapter = myAdapter*/
 
                         }
 

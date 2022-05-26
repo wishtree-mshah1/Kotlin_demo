@@ -1,6 +1,6 @@
-package com.example.kotlin_demo.network
+package com.example.kotlin_demo.data
 
-import com.example.kotlin_demo.models.User
+import com.example.kotlin_demo.data.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore

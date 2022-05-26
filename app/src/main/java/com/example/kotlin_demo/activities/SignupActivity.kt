@@ -14,8 +14,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import com.example.kotlin_demo.R
-import com.example.kotlin_demo.network.UserDao
-import com.example.kotlin_demo.models.User
+import com.example.kotlin_demo.data.UserDao
+import com.example.kotlin_demo.data.User
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 
