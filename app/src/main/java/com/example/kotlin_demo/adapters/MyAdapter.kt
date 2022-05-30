@@ -29,8 +29,8 @@ class MyAdapter(val context: Context): RecyclerView.Adapter<MyAdapter.ViewHolder
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         try {
-            holder.userId.text = allData[holder.adapterPosition].userId.toString()
-            holder.title.text = allData[holder.adapterPosition].title
+            holder.userId.text = allData[holder.adapterPosition].id.toString()
+            holder.title.text = allData[holder.adapterPosition].body
         }
         catch (e:Exception){
             println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")

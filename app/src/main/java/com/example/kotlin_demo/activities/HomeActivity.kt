@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,7 +26,6 @@ import com.example.kotlin_demo.adapters.MyAdapter
 import com.example.kotlin_demo.data.ApiDatabase
 import com.example.kotlin_demo.interfaces.ApiInterface
 import com.example.kotlin_demo.data.MyDataItem
-import com.example.kotlin_demo.data.User
 import com.example.kotlin_demo.repo.APiDataRepository
 import com.example.kotlin_demo.viewmodels.ApiDataVMFactory
 import com.example.kotlin_demo.viewmodels.ApiDataViewModels
@@ -46,10 +46,11 @@ class HomeActivity : AppCompatActivity() {
 
     private  lateinit var welcomeMess: TextView
     private lateinit var auth: FirebaseAuth
-//    lateinit var myAdapter: MyAdapter
-    lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var apiDataViewModels: ApiDataViewModels
-    var allData = ArrayList<MyDataItem>()
+    private lateinit var NestedScrollView:NestedScrollView
+    private lateinit var linearLayoutManager:LinearLayoutManager
+    var _start: Int = 0
+    var _limit: Int = 10
 
     companion object {
         private const val STORAGE_PERMISSION_CODE = 101
@@ -63,6 +64,8 @@ class HomeActivity : AppCompatActivity() {
 
         welcomeMess = findViewById(R.id.textView9)
         auth= FirebaseAuth.getInstance()
+        NestedScrollView = findViewById(R.id.NestedScroll)
+
 
         showDetails()
 
@@ -72,15 +75,7 @@ class HomeActivity : AppCompatActivity() {
         recyclerview_users.adapter = adapter
 
 
-      /*  var recycler = findViewById<RecyclerView>(R.id.recyclerview_users)
-        recycler.setHasFixedSize(true)
-        linearLayoutManager = LinearLayoutManager(this)
-        recycler.layoutManager = linearLayoutManager*/
-
-        doNetworkCalls()
-/*
-        checkApiCalling()
-*/
+        doNetworkCalls(_start, _limit)
 
         val dao = ApiDatabase.getDatabase(applicationContext).getApiDataDao()
         val repository = APiDataRepository(dao)
@@ -88,7 +83,27 @@ class HomeActivity : AppCompatActivity() {
         apiDataViewModels.allData.observe(this, Observer {
             adapter.updateData(it)
         })
-    }
+
+        recyclerview_users.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                val totalItemCount = recyclerView!!.layoutManager?.itemCount
+                println(totalItemCount)
+                try {
+                    if (!recyclerView.canScrollVertically(1) && newState==RecyclerView.SCROLL_STATE_IDLE) {
+                        d("-----","end");
+                        _start = _start+10
+                        doNetworkCalls(_start,_limit)
+                    }
+                }
+                catch (e:Exception){
+                    Log.e("Pagination Exception", e.toString())
+                }
+
+            }
+        })
+        }
+
 
     private fun showDetails() {
         try {
@@ -98,7 +113,6 @@ class HomeActivity : AppCompatActivity() {
             }
         }
         catch (e:Exception){
-            println("!!!!!!!!!!!!!!!!!!!!!!!!")
             println(e)
         }
     }
@@ -156,7 +170,7 @@ class HomeActivity : AppCompatActivity() {
             println("successfull")
         }
     }*/
-    private fun doNetworkCalls(){
+    private fun doNetworkCalls(_start: Int, _limit: Int) {
         try {
             CoroutineScope(Dispatchers.IO).launch {
                 val responseDatas = async {
@@ -167,7 +181,7 @@ class HomeActivity : AppCompatActivity() {
                         .build()
                         .create(ApiInterface::class.java)
 
-                    val retrofitData =  retrofitBuilder.getData()
+                    val retrofitData =  retrofitBuilder.getData(_start,_limit)
 
                     retrofitData.enqueue(object : Callback<List<MyDataItem>?> {
                         override fun onResponse(
@@ -187,16 +201,6 @@ class HomeActivity : AppCompatActivity() {
 
                             }
 
-                            println("////////////////////////////////////")
-                            println(responseBody[1].body)
-                            println(responseBody.size)
-                            println("////////////////////////////////////")
-
-                            /*myAdapter = MyAdapter(baseContext, responseBody)
-                            myAdapter.notifyDataSetChanged()
-                            var recycler = findViewById<RecyclerView>(R.id.recyclerview_users)
-                            recycler.adapter = myAdapter*/
-
                         }
 
                         override fun onFailure(call: Call<List<MyDataItem>?>, t: Throwable) {
@@ -205,12 +209,12 @@ class HomeActivity : AppCompatActivity() {
                     })
                 }.await()
                 if (responseDatas != null){
-                    Log.d("ABC","Calledddddddddddddddddddd")
+                    d("ABC","Called")
                 }
             }
         }
         catch (e:Exception){
-            Log.e("Exceptionnnnnnnnnn",e.localizedMessage)
+            Log.e("Exception",e.localizedMessage)
         }
 
     }
