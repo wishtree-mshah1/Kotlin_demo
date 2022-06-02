@@ -4,8 +4,13 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../../layout/custom_preview.xml" value="0.1" />
+        <entry key="../../../Android/Sdk/platforms/android-32/data/res/drawable/ratingbar_indicator_material.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/button.xml" value="0.1325" />
+        <entry key="app/src/main/res/drawable/progress_back.xml" value="0.1325" />
         <entry key="app/src/main/res/layout/activity_home.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/row_items.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/row_items.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/row_items1.xml" value="0.1484375" />
+        <entry key="app/src/main/res/layout/row_progress.xml" value="0.15172101449275363" />
       </map>
     </option>
   </component>

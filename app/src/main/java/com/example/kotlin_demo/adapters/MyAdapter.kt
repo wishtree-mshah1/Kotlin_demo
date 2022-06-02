@@ -1,83 +1,87 @@
 package com.example.kotlin_demo.adapters
 
+import android.R
+import android.annotation.SuppressLint
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlin_demo.data.MyDataItem
-import com.example.kotlin_demo.R
 
 
-class MyAdapter(val context: Context): RecyclerView.Adapter<MyAdapter.ViewHolder>() {
-
+class MyAdapter(val context: Context) : RecyclerView.Adapter<MyAdapter.BaseViewHolder>() {
     var allData = ArrayList<MyDataItem>()
 
-    class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        var userId: TextView = itemView.findViewById(R.id.userId)
-        var title: TextView = itemView.findViewById(R.id.title)
+    open class BaseViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+
+    }
+    class ViewHolder(itemView: View): BaseViewHolder(itemView) {
+        var userId: TextView = itemView.findViewById(com.example.kotlin_demo.R.id.userId)
+        var title: TextView = itemView.findViewById(com.example.kotlin_demo.R.id.title)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView =  ViewHolder(LayoutInflater.from(context).inflate(R.layout.row_items, parent,false))
-        return itemView
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        try {
-            holder.userId.text = allData[holder.adapterPosition].id.toString()
-            holder.title.text = allData[holder.adapterPosition].body
-        }
-        catch (e:Exception){
-            println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            println(e)
-
-        }
-
-        /*lateinit var apiDataViewModels: ApiDataViewModels
-        apiDataViewModels.insertData(MyDataItem(userList[position].body.toString(),userList[position].id.toInt(),userList[position].title.toString(),userList[position].id.toInt()))
-*/
-    }
-
-    private fun checkForInternet(context: Context): Boolean {
-
-        // register activity with the connectivity manager service
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        // if the android version is equal to M
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            // Returns a Network object corresponding to the currently active default data network.
-            val network = connectivityManager.activeNetwork ?: return false
-
-            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
-
-            return when {
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                else -> false
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        lateinit var viewHolder: BaseViewHolder
+        val inflater = LayoutInflater.from(parent.context)
+        when (viewType) {
+            ITEM -> {
+                val viewItem: View = inflater.inflate(com.example.kotlin_demo.R.layout.row_items, parent, false)
+                viewHolder = ViewHolder(viewItem)
             }
-        } else {
-            // If android version below M
-            @Suppress("DEPRECATION") val networkInfo =
-                connectivityManager.activeNetworkInfo ?: return false
-            @Suppress("DEPRECATION")
-            return networkInfo.isConnected
+            LOADING -> {
+                val viewLoading: View = inflater.inflate(com.example.kotlin_demo.R.layout.row_progress, parent, false)
+                viewHolder = LoadingViewHolder(viewLoading)
+            }
+        }
+        return viewHolder
+    }
+
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+
+        when (getItemViewType(position)) {
+            ITEM -> {
+                val itemHolder =  holder as ViewHolder
+                itemHolder.userId.text = allData[holder.adapterPosition].id.toString()
+                itemHolder.title.text = allData[holder.adapterPosition].body
+            }
+            LOADING -> {
+                println("loading")
+            }
         }
     }
 
     override fun getItemCount(): Int {
-
-        return allData.size
+        return this.allData.size + 1
     }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (position == this.allData!!.size) LOADING else ITEM
+    }
+
     fun updateData(apiDataList: List<MyDataItem>){
         allData.clear()
         allData.addAll(apiDataList)
 
         notifyDataSetChanged()
     }
+    fun getItem(position: Int): Int {
+        return allData.size
+    }
+
+    @SuppressLint("ResourceType")
+    inner class LoadingViewHolder(itemView: View) : BaseViewHolder(itemView) {
+
+        init {
+
+        }
+    }
+
+    companion object {
+        private const val LOADING = 0
+        private const val ITEM = 1
+    }
+
+
 }

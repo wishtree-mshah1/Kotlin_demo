@@ -60,13 +60,15 @@
                         android:textStyle="normal" />
 
                 </LinearLayout>
-                
+
             </LinearLayout>
 
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
-    
+
+    <include
+        layout="@layout/row_progress"/>
     <!--<ProgressBar
         android:layout_width="20dp"
         android:layout_height="20dp"
