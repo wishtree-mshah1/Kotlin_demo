@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/api_data"
+        android:title="API"
+        android:icon="@drawable/list"
+        />
+    <item
+        android:id="@+id/todo"
+        android:title="TODO"
+        android:icon="@drawable/todo"
+        />
+    <item
+        android:id="@+id/profile"
+        android:title="PROFILE"
+        android:icon="@drawable/person"
+        />
+</menu>

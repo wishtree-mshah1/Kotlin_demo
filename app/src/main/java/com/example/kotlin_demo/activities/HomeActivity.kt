@@ -30,6 +30,7 @@ import com.example.kotlin_demo.interfaces.ApiInterface
 import com.example.kotlin_demo.repo.APiDataRepository
 import com.example.kotlin_demo.viewmodels.ApiDataVMFactory
 import com.example.kotlin_demo.viewmodels.ApiDataViewModels
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +52,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var constrait:LinearLayout
     private lateinit var MyAdapter: MyAdapter
     private lateinit var manager:LinearLayoutManager
+    lateinit var bottom_nav: BottomNavigationView
     var allData = ArrayList<MyDataItem>()
     var _start: Int = 0
     var _limit: Int = 10
@@ -66,8 +68,7 @@ class HomeActivity : AppCompatActivity() {
         checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE)
         welcomeMess = findViewById(R.id.textView9)
         auth= FirebaseAuth.getInstance()
-        //NestedScrollView = findViewById(R.id.NestedScroll)
-        //progressBar = findViewById(R.id.progressBar)
+        bottom_nav = findViewById(R.id.bottom_navigation)
         constrait = findViewById<LinearLayout>(R.id.constrait)
 
 
@@ -90,8 +91,24 @@ class HomeActivity : AppCompatActivity() {
             adapter.updateData(it)
         })
 
-
-
+        bottom_nav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.api_data ->{
+                    Toast.makeText(applicationContext,"GET API DATA",Toast.LENGTH_SHORT).show()
+                    intent = Intent(applicationContext, HomeActivity::class.java)
+                    startActivity(intent)
+                }
+                R.id.todo ->{
+                    Toast.makeText(applicationContext,"TODO",Toast.LENGTH_SHORT).show()
+                    intent = Intent(applicationContext, TodoActivity::class.java)
+                    startActivity(intent)
+                }
+                R.id.profile ->{
+                    Toast.makeText(applicationContext,"3",Toast.LENGTH_SHORT).show()
+                }
+            }
+            true
+        }
         recyclerview_users.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

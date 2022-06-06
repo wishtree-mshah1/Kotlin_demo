@@ -18,3 +18,4 @@ interface ApiDataDao {
     @Query(value = "SELECT * From apidata_table order by id ASC")
     fun getAllApiData():LiveData<List<MyDataItem>>
 }
+

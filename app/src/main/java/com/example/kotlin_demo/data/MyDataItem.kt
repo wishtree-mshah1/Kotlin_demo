@@ -11,3 +11,13 @@ data class MyDataItem(
     @ColumnInfo(name = "title")val title: String,
     @ColumnInfo(name = "userid")val userId: Int
 )
+
+@Entity(tableName = "todo_table")
+data class TodoData(
+    @PrimaryKey(autoGenerate = true) val id: Long,
+    @ColumnInfo(name = "title") val title: String,
+    @ColumnInfo(name = "desc") val desc: String,
+    @ColumnInfo(name = "time") val time: String,
+    @ColumnInfo(name = "date") val date: String
+
+)

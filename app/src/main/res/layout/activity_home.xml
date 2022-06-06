@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:paddingBottom="20dp"
     tools:context=".activities.HomeActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -76,6 +75,7 @@
             android:id="@+id/recyclerview_users"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
             android:background="@color/white"
             android:paddingBottom="100dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -94,18 +94,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-    </LinearLayout>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:background="@color/white"
+            android:isScrollContainer="true"
+            android:layout_height="wrap_content"
+            app:menu="@menu/bottom_navigation_menu" />
 
-    <!--<ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:visibility="invisible"
-        android:layout_alignParentBottom="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />-->
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
