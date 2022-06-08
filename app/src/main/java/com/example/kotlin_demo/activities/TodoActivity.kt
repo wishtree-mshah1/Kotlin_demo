@@ -2,10 +2,9 @@ package com.example.kotlin_demo.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageButton
 import android.widget.Toast
-import androidx.lifecycle.Observer
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,21 +18,29 @@ import com.example.kotlin_demo.viewmodels.TodoDataViewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
+private const val TIME_INTERVAL =2000 // # milliseconds, desired time passed between two back presses.
+
+private var mBackPressed: Long = 0
+
 class TodoActivity : AppCompatActivity() {
 
     lateinit var bottom_nav: BottomNavigationView
     lateinit var floating_btn: ExtendedFloatingActionButton
     private lateinit var todoDataViewModels: TodoDataViewModels
-   // lateinit var edit_btn : ImageButton
-   // lateinit var delete_btn : ImageButton
+    override fun onBackPressed() {
+            mBackPressed = System.currentTimeMillis();
+            val a = Intent(Intent.ACTION_MAIN)
+            a.addCategory(Intent.CATEGORY_HOME)
+            a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(a)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_todo)
         bottom_nav = findViewById(R.id.bottom_navigation)
         floating_btn = findViewById(R.id.floating_btn)
-//        edit_btn = findViewById(R.id.edit)
-//        delete_btn = findViewById(R.id.delete)
+
 
         val recyclerview = findViewById<RecyclerView>(R.id.todo_recycler)
         recyclerview.layoutManager = LinearLayoutManager(this)
@@ -89,6 +96,7 @@ class TodoActivity : AppCompatActivity() {
         intent.putExtra("title",todoData.title)
         intent.putExtra("desc",todoData.desc)
         intent.putExtra("id1",todoData.id)
+        intent.putExtra("color",todoData.color)
         intent.putExtra("update_task","update")
         startActivity(intent)
         this.finish()

@@ -21,7 +21,8 @@
         <activity
             android:name=".activities.TodoAddActivity"
             android:exported="false"
-            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
+            />
         <activity
             android:name=".activities.TodoActivity"
             android:exported="false"

@@ -7,7 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
+    <color name="red">#A80101</color>
+    <color name="blue">#011898</color>
+    <color name="yellow">#B69802</color>
+    <color name="grey">#C3C3C3</color>
     <color name="greenshade">#012443</color>
     <color name="Lightpink">#7FC8A9</color>
     <color name="themecolor">#EE6868</color>
@@ -16,6 +19,6 @@
 
     <color name="Lightthemecolor">#EA9C9C</color>
     <color name="titlecolor">#424242</color>
-    <color name="transperent">#00000000</color>
+    <color name="transperent">#7EE8E7E7</color>
     <color name="toolbarcolor">#EC5454</color>
 </resources>

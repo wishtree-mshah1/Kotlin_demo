@@ -18,6 +18,10 @@ data class TodoData(
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "desc") val desc: String,
     @ColumnInfo(name = "time") val time: String,
-    @ColumnInfo(name = "date") val date: String
+    @ColumnInfo(name = "date") val date: String,
+    val color: String,
+    val hour: String,
+    val minute: String,
+    val ampm: String
 
 )
