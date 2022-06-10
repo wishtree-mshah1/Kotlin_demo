@@ -1,6 +1,9 @@
 package com.example.kotlin_demo.activities
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +15,8 @@ import com.example.kotlin_demo.R
 import com.example.kotlin_demo.adapters.TodoAdapter
 import com.example.kotlin_demo.data.TodoData
 import com.example.kotlin_demo.data.TodoDatabase
+import com.example.kotlin_demo.databinding.ActivityMainBinding
+import com.example.kotlin_demo.notification.channelID
 import com.example.kotlin_demo.repo.TodoDataRepository
 import com.example.kotlin_demo.viewmodels.TodoDataVMFactory
 import com.example.kotlin_demo.viewmodels.TodoDataViewModels
@@ -24,23 +29,27 @@ private var mBackPressed: Long = 0
 
 class TodoActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
     lateinit var bottom_nav: BottomNavigationView
     lateinit var floating_btn: ExtendedFloatingActionButton
     private lateinit var todoDataViewModels: TodoDataViewModels
+
     override fun onBackPressed() {
-            mBackPressed = System.currentTimeMillis();
-            val a = Intent(Intent.ACTION_MAIN)
-            a.addCategory(Intent.CATEGORY_HOME)
-            a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(a)
+        mBackPressed = System.currentTimeMillis();
+        val a = Intent(Intent.ACTION_MAIN)
+        a.addCategory(Intent.CATEGORY_HOME)
+        a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(a)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_todo)
         bottom_nav = findViewById(R.id.bottom_navigation)
         floating_btn = findViewById(R.id.floating_btn)
 
+//        createNotificationChannel()
 
         val recyclerview = findViewById<RecyclerView>(R.id.todo_recycler)
         recyclerview.layoutManager = LinearLayoutManager(this)
@@ -83,6 +92,22 @@ class TodoActivity : AppCompatActivity() {
             true
         }
     }
+
+    /*private fun createNotificationChannel() {
+        val name = "Notif Channel"
+        val des = "Description"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel(channelID,name, importance)
+        } else {
+            TODO("VERSION.SDK_INT < O")
+        }
+        channel.description = des
+
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }*/
+
 
     fun setClick(todoData: TodoData) {
         todoDataViewModels.deleteData(todoData)

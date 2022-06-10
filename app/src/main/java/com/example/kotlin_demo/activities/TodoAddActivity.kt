@@ -1,6 +1,7 @@
 package com.example.kotlin_demo.activities
 
-import android.app.TimePickerDialog
+import android.app.*
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.kotlin_demo.R
 import com.example.kotlin_demo.data.TodoData
 import com.example.kotlin_demo.data.TodoDatabase
+import com.example.kotlin_demo.notification.*
 import com.example.kotlin_demo.repo.TodoDataRepository
 import com.example.kotlin_demo.viewmodels.TodoDataVMFactory
 import com.example.kotlin_demo.viewmodels.TodoDataViewModels
@@ -25,6 +27,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import de.hdodenhof.circleimageview.CircleImageView
 import java.time.LocalDateTime
+import java.util.*
+import kotlin.math.min
 
 class TodoAddActivity : AppCompatActivity() {
 
@@ -37,63 +41,70 @@ class TodoAddActivity : AppCompatActivity() {
     private val timePickerDialogListener: TimePickerDialog.OnTimeSetListener =
         object : TimePickerDialog.OnTimeSetListener {
             override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+                println("hhhh")
+                println(hourOfDay)
+                println(minute)
 
-                val formattedTime: String = when {
-                    hourOfDay == 0 -> {
-                        if (minute < 10) {
-                            ampm_alarm = "am"
-                            hours_alarm = hourOfDay+12
-                            min_alarm = minute
-                            "${hourOfDay + 12}:0${minute} am"
-
-
-                        } else {
-                            ampm_alarm = "am"
-                            hours_alarm = hourOfDay+12
-                            min_alarm = minute
-                            "${hourOfDay + 12}:${minute} am"
-                        }
-                    }
-                    hourOfDay > 12 -> {
-                        if (minute < 10) {
-                            ampm_alarm = "pm"
-                            hours_alarm = hourOfDay-12
-                            min_alarm = minute
-                            "${hourOfDay - 12}:0${minute} pm"
-                        } else {
-                            ampm_alarm = "pm"
-                            hours_alarm = hourOfDay-12
-                            min_alarm = minute
-                            "${hourOfDay - 12}:${minute} pm"
-                        }
-                    }
-                    hourOfDay == 12 -> {
-                        if (minute < 10) {
-                            ampm_alarm = "pm"
-                            hours_alarm = hourOfDay
-                            min_alarm = minute
-                            "${hourOfDay}:0${minute} pm"
-                        } else {
-                            ampm_alarm = "pm"
-                            hours_alarm = hourOfDay
-                            min_alarm = minute
-                            "${hourOfDay}:${minute} pm"
-                        }
-                    }
-                    else -> {
-                        if (minute < 10) {
-                            ampm_alarm = "am"
-                            hours_alarm = hourOfDay
-                            min_alarm = minute
-                            "${hourOfDay}:${minute} am"
-                        } else {
-                            ampm_alarm = "am"
-                            hours_alarm = hourOfDay
-                            min_alarm = minute
-                            "${hourOfDay}:${minute} am"
-                        }
-                    }
-                }
+                hours_alarm = hourOfDay
+                min_alarm = minute
+//                val formattedTime: String = when {
+//
+//                    hourOfDay == 0 -> {
+//                        if (minute < 10) {
+//                            ampm_alarm = "am"
+//                            hours_alarm = hourOfDay+12
+//                            min_alarm = minute
+//                            "${hourOfDay + 12}:0${minute} am"
+//
+//
+//                        } else {
+//                            ampm_alarm = "am"
+//                            hours_alarm = hourOfDay+12
+//                            min_alarm = minute
+//                            "${hourOfDay + 12}:${minute} am"
+//                        }
+//                    }
+//                    hourOfDay > 12 -> {
+//                        if (minute < 10) {
+//                            ampm_alarm = "pm"
+//                            hours_alarm = hourOfDay-12
+//                            min_alarm = minute
+//                            "${hourOfDay - 12}:0${minute} pm"
+//                        } else {
+//                            ampm_alarm = "pm"
+//                            hours_alarm = hourOfDay-12
+//                            min_alarm = minute
+//                            "${hourOfDay - 12}:${minute} pm"
+//                        }
+//                    }
+//                    hourOfDay == 12 -> {
+//                        if (minute < 10) {
+//                            ampm_alarm = "pm"
+//                            hours_alarm = hourOfDay
+//                            min_alarm = minute
+//                            "${hourOfDay}:0${minute} pm"
+//                        } else {
+//                            ampm_alarm = "pm"
+//                            hours_alarm = hourOfDay
+//                            min_alarm = minute
+//                            "${hourOfDay}:${minute} pm"
+//                        }
+//                    }
+//                    else -> {
+//                        if (minute < 10) {
+//                            ampm_alarm = "am"
+//                            hours_alarm = hourOfDay
+//                            min_alarm = minute
+//                            "${hourOfDay}:${minute} am"
+//                        } else {
+//                            ampm_alarm = "am"
+//                            hours_alarm = hourOfDay
+//                            min_alarm = minute
+//                            "${hourOfDay}:${minute} am"
+//                        }
+//                    }
+//                }
+                var formattedTime = hourOfDay.toString()+":"+min_alarm.toString()
 
                 previewSelectedTimeTextView = findViewById(R.id.time1)
                 previewSelectedTimeTextView.text = formattedTime
@@ -126,6 +137,7 @@ class TodoAddActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_todo_add)
+        createNotificationChannel()
 
         submit_btn =  findViewById(R.id.submit)
         update_btn =  findViewById(R.id.update)
@@ -286,11 +298,12 @@ class TodoAddActivity : AppCompatActivity() {
 
         submit_btn.setOnClickListener(){
 
+            scheduleNotification()
             println("yeeeee")
-            todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),time.toString(),fulldate.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm.toString()))
+            todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),time.toString(),fulldate.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm))
             id = id+1
-            intent = Intent(applicationContext, TodoActivity::class.java)
-            startActivity(intent)
+            //intent = Intent(applicationContext, TodoActivity::class.java)
+            //startActivity(intent)
         }
         update_btn.setOnClickListener(){
             println("nooooooo")
@@ -299,13 +312,91 @@ class TodoAddActivity : AppCompatActivity() {
                 desc.text.toString(),
                 time.toString(),
                 fulldate.toString(),
-                color.toString(),
-                hours_alarm.toString(),
-                min_alarm.toString(),
-                ampm_alarm.toString()))
+                color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm))
             intent = Intent(applicationContext, TodoActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun scheduleNotification() {
+        val intent = Intent(applicationContext, ReminderBrodcast::class.java)
+        val title = title.text.toString()
+        val message = desc.text.toString()
+        intent.putExtra(titleExtra, title)
+        intent.putExtra(messageExtra, message)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            notificationID,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val time = getTime()
+        println("aaa")
+        println(time)
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            time,
+            pendingIntent
+        )
+        showAlert(title,time, message)
+    }
+
+    private fun createNotificationChannel()
+    {
+        val name = "Notif Channel"
+        val desc = "A Description of the Channel"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel(channelID, name, importance)
+        } else {
+            TODO("VERSION.SDK_INT < O")
+        }
+        channel.description = desc
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
+    private fun showAlert(title: String, time: Long, message: String) {
+        val date = Date(time)
+        println("Date")
+        println(date)
+        val dateFormat = android.text.format.DateFormat.getLongDateFormat(applicationContext)
+        val timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext)
+        println("Timef")
+        println(timeFormat.format(date))
+        AlertDialog.Builder(this)
+            .setTitle("Notification Scheduled")
+            .setMessage("Title: "+ title + "Message" + message + "At: " + timeFormat.format(date))
+            .setPositiveButton("Okay"){_,_ ->
+                intent = Intent(applicationContext, TodoActivity::class.java)
+                startActivity(intent)
+            }
+            .show()
+    }
+
+    private fun getTime(): Long {
+        val calendar = Calendar.getInstance()
+        val current = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            LocalDateTime.now()
+        } else {
+            TODO("VERSION.SDK_INT < O")
+        }
+        var date =  current.dayOfMonth
+        var month = current.monthValue
+        var year = current.year
+        calendar.set(year,month,date,hours_alarm,min_alarm)
+        println("calendar.timeInMillis")
+        println(calendar.timeInMillis)
+        println(year)
+        println(month)
+        println(date)
+        println(hours_alarm)
+        println(min_alarm)
+        return calendar.timeInMillis
+
     }
 
     override fun onBackPressed() {

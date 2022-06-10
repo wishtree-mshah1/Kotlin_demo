@@ -21,7 +21,8 @@ data class TodoData(
     @ColumnInfo(name = "date") val date: String,
     val color: String,
     val hour: String,
-    val minute: String,
-    val ampm: String
+    val min: String,
+    val ampm: String,
+
 
 )

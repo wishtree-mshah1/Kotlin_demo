@@ -4,8 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
@@ -22,9 +25,9 @@ class TodoAdapter(val context: Context, val listner: TodoActivity) : RecyclerVie
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoAdapter.ViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(context)
-        val view = ViewHolder(inflater.inflate(R.layout.todo_items, parent, false))
+        val view = ViewHolder(inflater.inflate(R.layout.todo_items1, parent, false))
 
-        view.delete.setOnClickListener(){
+            view.delete.setOnClickListener(){
             listner.setClick(allNotes[view.adapterPosition])
         }
         view.edit.setOnClickListener(){
@@ -42,6 +45,14 @@ class TodoAdapter(val context: Context, val listner: TodoActivity) : RecyclerVie
         holder.desc.text = ItemsViewModel.desc
         holder.time.text = ItemsViewModel.time
         holder.date.text = ItemsViewModel.date
+        holder.alarm_time.text = ItemsViewModel.hour+" : "+ItemsViewModel.min
+
+        if (ItemsViewModel.hour.toInt() != 0){
+            holder.alarm_img.setVisibility(VISIBLE)
+        }
+        else{
+            holder.alarm_img.setVisibility(INVISIBLE)
+        }
         if (ItemsViewModel.color.toString() == "Blue") {
             holder.card.setBackgroundResource(R.color.blue)
         }
@@ -79,5 +90,8 @@ class TodoAdapter(val context: Context, val listner: TodoActivity) : RecyclerVie
         var delete: ImageButton = view.findViewById(R.id.delete)
         var edit: ImageButton = view.findViewById(R.id.edit)
         var card: CardView = view.findViewById(R.id.cardView)
+        var alarm_img: ImageView = view.findViewById(R.id.alarm_img)
+        var alarm_time: TextView = view.findViewById(R.id.alarm_time)
+
     }
 }
