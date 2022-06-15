@@ -31,8 +31,7 @@
             />
         <activity
             android:name=".activities.TodoActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
+            android:exported="false" />
         <activity
             android:name=".activities.HomeActivity"
             android:exported="true"

@@ -1,10 +1,13 @@
 package com.example.kotlin_demo.activities
 
+import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -33,6 +36,9 @@ class TodoActivity : AppCompatActivity() {
     lateinit var bottom_nav: BottomNavigationView
     lateinit var floating_btn: ExtendedFloatingActionButton
     private lateinit var todoDataViewModels: TodoDataViewModels
+    private var mainMenu: Menu? = null
+    private lateinit var adapter: TodoAdapter
+
 
     override fun onBackPressed() {
         mBackPressed = System.currentTimeMillis();
@@ -49,12 +55,12 @@ class TodoActivity : AppCompatActivity() {
         bottom_nav = findViewById(R.id.bottom_navigation)
         floating_btn = findViewById(R.id.floating_btn)
 
-//        createNotificationChannel()
+        createNotificationChannel()
 
         val recyclerview = findViewById<RecyclerView>(R.id.todo_recycler)
         recyclerview.layoutManager = LinearLayoutManager(this)
 
-        val adapter = TodoAdapter(this,this)
+        adapter = TodoAdapter(this,this){show -> showDeleteMenu(show)}
         recyclerview.adapter = adapter
 
         val dao = TodoDatabase.getDatabase(applicationContext).getTodoDataDao()
@@ -93,7 +99,37 @@ class TodoActivity : AppCompatActivity() {
         }
     }
 
-    /*private fun createNotificationChannel() {
+    fun showDeleteMenu(show: Boolean){
+        mainMenu?.findItem(R.id.delete_all)?.isVisible = show
+    }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        mainMenu = menu
+        menuInflater.inflate(R.menu.custom_menu,mainMenu)
+        showDeleteMenu(false)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId)
+        {
+            R.id.delete_all ->{delete()}
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun delete() {
+        val alertDialog = AlertDialog.Builder(this)
+        alertDialog.setTitle("Delete")
+        alertDialog.setMessage("Do you want to delete all selected items?")
+        alertDialog.setPositiveButton("Delete"){_,_ ->
+            adapter.deleteSelectedItems()
+            showDeleteMenu(false)
+        }
+        alertDialog.setNegativeButton("Cancel"){_,_ ->}
+        alertDialog.show()
+    }
+
+    private fun createNotificationChannel() {
         val name = "Notif Channel"
         val des = "Description"
         val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -106,13 +142,12 @@ class TodoActivity : AppCompatActivity() {
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
-    }*/
+    }
 
 
     fun setClick(todoData: TodoData) {
         todoDataViewModels.deleteData(todoData)
         println("sdhfhsdfsdfg////")
-
     }
 
     fun onItemClick(todoData: TodoData) {

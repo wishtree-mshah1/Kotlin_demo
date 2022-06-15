@@ -15,6 +15,7 @@ interface TodoDataDao {
     @Delete
     suspend fun delete(todoData: TodoData)
 
+
     @Query(value = "SELECT * From todo_table order by id ASC")
     fun getAllApiData():LiveData<List<TodoData>>
 }

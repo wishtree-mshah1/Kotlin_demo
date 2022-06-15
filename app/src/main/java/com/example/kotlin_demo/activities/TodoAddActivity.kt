@@ -1,118 +1,53 @@
 package com.example.kotlin_demo.activities
 
 import android.app.*
-import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
-import androidx.lifecycle.Observer
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.TimePicker
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.kotlin_demo.R
 import com.example.kotlin_demo.data.TodoData
 import com.example.kotlin_demo.data.TodoDatabase
+import com.example.kotlin_demo.databinding.ActivityMainBinding
 import com.example.kotlin_demo.notification.*
 import com.example.kotlin_demo.repo.TodoDataRepository
 import com.example.kotlin_demo.viewmodels.TodoDataVMFactory
 import com.example.kotlin_demo.viewmodels.TodoDataViewModels
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import de.hdodenhof.circleimageview.CircleImageView
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.math.min
+
 
 class TodoAddActivity : AppCompatActivity() {
 
     lateinit var previewSelectedTimeTextView: TextView
+    lateinit var picker: MaterialTimePicker
+    private lateinit var calender:Calendar
     var hours_alarm = 0
     var min_alarm = 0
     var ampm_alarm:String = "am"
+    var title1:String = ""
+    var des1:String = ""
     // listener which is triggered when the
     // time is picked from the time picker dialog
-    private val timePickerDialogListener: TimePickerDialog.OnTimeSetListener =
-        object : TimePickerDialog.OnTimeSetListener {
-            override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
-                println("hhhh")
-                println(hourOfDay)
-                println(minute)
 
-                hours_alarm = hourOfDay
-                min_alarm = minute
-//                val formattedTime: String = when {
-//
-//                    hourOfDay == 0 -> {
-//                        if (minute < 10) {
-//                            ampm_alarm = "am"
-//                            hours_alarm = hourOfDay+12
-//                            min_alarm = minute
-//                            "${hourOfDay + 12}:0${minute} am"
-//
-//
-//                        } else {
-//                            ampm_alarm = "am"
-//                            hours_alarm = hourOfDay+12
-//                            min_alarm = minute
-//                            "${hourOfDay + 12}:${minute} am"
-//                        }
-//                    }
-//                    hourOfDay > 12 -> {
-//                        if (minute < 10) {
-//                            ampm_alarm = "pm"
-//                            hours_alarm = hourOfDay-12
-//                            min_alarm = minute
-//                            "${hourOfDay - 12}:0${minute} pm"
-//                        } else {
-//                            ampm_alarm = "pm"
-//                            hours_alarm = hourOfDay-12
-//                            min_alarm = minute
-//                            "${hourOfDay - 12}:${minute} pm"
-//                        }
-//                    }
-//                    hourOfDay == 12 -> {
-//                        if (minute < 10) {
-//                            ampm_alarm = "pm"
-//                            hours_alarm = hourOfDay
-//                            min_alarm = minute
-//                            "${hourOfDay}:0${minute} pm"
-//                        } else {
-//                            ampm_alarm = "pm"
-//                            hours_alarm = hourOfDay
-//                            min_alarm = minute
-//                            "${hourOfDay}:${minute} pm"
-//                        }
-//                    }
-//                    else -> {
-//                        if (minute < 10) {
-//                            ampm_alarm = "am"
-//                            hours_alarm = hourOfDay
-//                            min_alarm = minute
-//                            "${hourOfDay}:${minute} am"
-//                        } else {
-//                            ampm_alarm = "am"
-//                            hours_alarm = hourOfDay
-//                            min_alarm = minute
-//                            "${hourOfDay}:${minute} am"
-//                        }
-//                    }
-//                }
-                var formattedTime = hourOfDay.toString()+":"+min_alarm.toString()
-
-                previewSelectedTimeTextView = findViewById(R.id.time1)
-                previewSelectedTimeTextView.text = formattedTime
-            }
-        }
     private lateinit var submit_btn : Button
     private lateinit var update_btn : Button
     private lateinit var time_text : TextView
+    private lateinit var time1 : TextView
     private lateinit var title : TextInputEditText
     private lateinit var desc : TextInputEditText
     private lateinit var desc_box : TextInputLayout
@@ -128,6 +63,11 @@ class TodoAddActivity : AppCompatActivity() {
     private lateinit var img4: ImageView
     private lateinit var img5: ImageView
     private lateinit var card_add: CardView
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var alarmManager: AlarmManager
+    private lateinit var reminderBrodcast: ReminderBrodcast
+    private lateinit var pendingIntent: PendingIntent
+
     var id: Long = 0
     var id1: Long = 0
     var color: String = "Blue"
@@ -136,12 +76,14 @@ class TodoAddActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_todo_add)
         createNotificationChannel()
 
         submit_btn =  findViewById(R.id.submit)
         update_btn =  findViewById(R.id.update)
         title = findViewById(R.id.title_txt)
+        time1 = findViewById(R.id.time1)
         desc = findViewById(R.id.des_txt)
         desc_box = findViewById(R.id.description)
         blue_color = findViewById(R.id.blue_circle)
@@ -158,16 +100,10 @@ class TodoAddActivity : AppCompatActivity() {
         time_text = findViewById(R.id.timepick)
 
         time_text.setOnClickListener {
-            val timePicker: TimePickerDialog = TimePickerDialog(
 
-                this,
-                timePickerDialogListener,
-                12,
-                10,
-                false
-            )
+            showTimePicker()
 
-            timePicker.show()
+
         }
 
         blue_color.setOnClickListener(){
@@ -298,12 +234,24 @@ class TodoAddActivity : AppCompatActivity() {
 
         submit_btn.setOnClickListener(){
 
-            scheduleNotification()
-            println("yeeeee")
-            todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),time.toString(),fulldate.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm))
-            id = id+1
-            //intent = Intent(applicationContext, TodoActivity::class.java)
-            //startActivity(intent)
+
+            intent.putExtra("titleExtra", title.text.toString())
+            intent.putExtra("messageExtra", desc.text.toString())
+
+            if (hours_alarm > 0 && min_alarm > 0){
+                scheduleNotification()
+                println("yeeeee")
+                todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),time.toString(),fulldate.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm,false))
+                id = id+1
+            }
+            else{
+
+                println("yeeeee")
+                todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),time.toString(),fulldate.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm,false))
+                id = id+1
+                intent = Intent(applicationContext, TodoActivity::class.java)
+                startActivity(intent)
+            }
         }
         update_btn.setOnClickListener(){
             println("nooooooo")
@@ -312,64 +260,89 @@ class TodoAddActivity : AppCompatActivity() {
                 desc.text.toString(),
                 time.toString(),
                 fulldate.toString(),
-                color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm))
+                color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm,false))
             intent = Intent(applicationContext, TodoActivity::class.java)
             startActivity(intent)
         }
     }
 
+    private fun showTimePicker() {
+
+        val picker =
+            MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(12)
+                .setMinute(10)
+                .setTitleText("Select Appointment time")
+                .build()
+
+
+        //calender = Calendar.getInstance()
+        picker.show(supportFragmentManager,"foxandroid")
+        picker.addOnPositiveButtonClickListener{
+            calender = Calendar.getInstance()
+            calender[Calendar.HOUR_OF_DAY] = picker.hour
+            calender[Calendar.MINUTE] = picker.minute
+            calender[Calendar.SECOND] = 0
+            calender[Calendar.MILLISECOND] = 0
+            hours_alarm = picker.hour
+            min_alarm = picker.minute
+            time1.setText(picker.hour.toString() +" : " + picker.minute)
+        }
+    }
+
+
     private fun scheduleNotification() {
-        val intent = Intent(applicationContext, ReminderBrodcast::class.java)
-        val title = title.text.toString()
-        val message = desc.text.toString()
-        intent.putExtra(titleExtra, title)
-        intent.putExtra(messageExtra, message)
 
-        val pendingIntent = PendingIntent.getBroadcast(
-            applicationContext,
-            notificationID,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this,ReminderBrodcast::class.java)
+
+        title1 = title.text.toString()
+        des1 = desc.text.toString()
+        intent.putExtra("title_Extra", title1)
+        intent.putExtra("desc_Extra", des1)
+        title1 = ""
+        des1 = ""
+        pendingIntent = PendingIntent.getBroadcast(this,0,intent,0)
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP,calender.timeInMillis,
+            AlarmManager.INTERVAL_DAY,pendingIntent
         )
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val time = getTime()
         println("aaa")
-        println(time)
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            time,
-            pendingIntent
-        )
-        showAlert(title,time, message)
+        println(calender.timeInMillis)
+        showAlert(title1,calender.time, des1)
     }
 
     private fun createNotificationChannel()
     {
-        val name = "Notif Channel"
-        val desc = "A Description of the Channel"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel(channelID, name, importance)
-        } else {
-            TODO("VERSION.SDK_INT < O")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            val name: CharSequence = "Notif Channel"
+            val desc = "A Description of the Channel"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel= NotificationChannel("channel1",name,importance)
+            channel.description = desc
+
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
         }
-        channel.description = desc
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
+//        val name = "Notif Channel"
+//        val desc = "A Description of the Channel"
+//        val importance = NotificationManager.IMPORTANCE_DEFAULT
+//        val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            NotificationChannel(channelID, name, importance)
+//        } else {
+//            TODO("VERSION.SDK_INT < O")
+//        }
+//        channel.description = desc
+//        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+//        notificationManager.createNotificationChannel(channel)
     }
 
-    private fun showAlert(title: String, time: Long, message: String) {
-        val date = Date(time)
-        println("Date")
-        println(date)
-        val dateFormat = android.text.format.DateFormat.getLongDateFormat(applicationContext)
-        val timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext)
-        println("Timef")
-        println(timeFormat.format(date))
+    private fun showAlert(title: String, time: Date, message: String) {
+
         AlertDialog.Builder(this)
             .setTitle("Notification Scheduled")
-            .setMessage("Title: "+ title + "Message" + message + "At: " + timeFormat.format(date))
+            .setMessage("Title: "+ title + "Message" + message + "At: " + calender.time)
             .setPositiveButton("Okay"){_,_ ->
                 intent = Intent(applicationContext, TodoActivity::class.java)
                 startActivity(intent)

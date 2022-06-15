@@ -1,8 +1,6 @@
 package com.example.kotlin_demo.repo
 
 import androidx.lifecycle.LiveData
-import com.example.kotlin_demo.data.ApiDataDao
-import com.example.kotlin_demo.data.MyDataItem
 import com.example.kotlin_demo.data.TodoData
 import com.example.kotlin_demo.data.TodoDataDao
 

@@ -23,6 +23,7 @@ data class TodoData(
     val hour: String,
     val min: String,
     val ampm: String,
+    var selected: Boolean,
 
 
 )
