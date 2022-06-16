@@ -1,6 +1,7 @@
 package com.example.kotlin_demo.adapters
 
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.INVISIBLE
@@ -30,7 +31,7 @@ class TodoAdapter(val context: Context, val listner: TodoActivity,private val sh
         val inflater: LayoutInflater = LayoutInflater.from(context)
         val view = ViewHolder(inflater.inflate(R.layout.todo_items1, parent, false))
 
-            view.delete.setOnClickListener(){
+        view.delete.setOnClickListener(){
             listner.setClick(allNotes[view.adapterPosition])
         }
         view.edit.setOnClickListener(){
@@ -45,12 +46,25 @@ class TodoAdapter(val context: Context, val listner: TodoActivity,private val sh
         val ItemsViewModel = allNotes[position]
 
         var id = ItemsViewModel.id
+        var imageUri = ItemsViewModel.image
+        val uri: Uri = Uri.parse(imageUri)
+        holder.thumbnail.setImageURI(uri)
         holder.title.text = ItemsViewModel.title
         holder.desc.text = ItemsViewModel.desc
         holder.time.text = ItemsViewModel.time
         holder.date.text = ItemsViewModel.date
         holder.iv.visibility = View.GONE
         holder.alarm_time.text = ItemsViewModel.hour+" : "+ItemsViewModel.min
+
+        println("imageUri")
+        println(uri.toString().length)
+        if (uri.toString() == "null"){
+            holder.thumbnail.setVisibility(View.GONE)
+        }
+        else{
+            holder.thumbnail.setVisibility(VISIBLE)
+
+        }
 
         if (ItemsViewModel.hour.toInt() != 0){
             holder.alarm_img.setVisibility(VISIBLE)
@@ -88,7 +102,6 @@ class TodoAdapter(val context: Context, val listner: TodoActivity,private val sh
             if (itemSelectedList.contains(position)){
 
                 itemSelectedList.removeAt(position)
-                itemSelectedList1.removeAt(ItemsViewModel.id.toInt())
                 holder.iv.visibility = View.GONE
                 if (ItemsViewModel.color.toString() == "Blue") {
                     holder.card.setBackgroundResource(R.color.blue)
@@ -170,6 +183,6 @@ class TodoAdapter(val context: Context, val listner: TodoActivity,private val sh
         var alarm_img: ImageView = view.findViewById(R.id.alarm_img)
         var alarm_time: TextView = view.findViewById(R.id.alarm_time)
         var iv: ImageView = view.findViewById(R.id.ImageView)
-
+        var thumbnail: ImageView = view.findViewById(R.id.thumbnail)
     }
 }

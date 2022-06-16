@@ -25,6 +25,12 @@ class TodoDataViewModels(private val repository: TodoDataRepository): ViewModel(
         }
     }
 
+    fun deleteDataId(id: Int){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteId(id)
+        }
+    }
+
 
 
 }

@@ -162,5 +162,3 @@ class TodoActivity : AppCompatActivity() {
         this.finish()
     }
 }
-
-

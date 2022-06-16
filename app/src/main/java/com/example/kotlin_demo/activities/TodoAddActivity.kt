@@ -2,11 +2,15 @@ package com.example.kotlin_demo.activities
 
 import android.app.*
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
+import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -47,10 +51,10 @@ class TodoAddActivity : AppCompatActivity() {
     private lateinit var submit_btn : Button
     private lateinit var update_btn : Button
     private lateinit var time_text : TextView
+    private lateinit var uploadImageTxt : TextView
     private lateinit var time1 : TextView
     private lateinit var title : TextInputEditText
-    private lateinit var desc : TextInputEditText
-    private lateinit var desc_box : TextInputLayout
+    private lateinit var desc : EditText
     private lateinit var todoDataViewModels: TodoDataViewModels
     private lateinit var blue_color: CircleImageView
     private lateinit var yellow_color: CircleImageView
@@ -62,12 +66,14 @@ class TodoAddActivity : AppCompatActivity() {
     private lateinit var img3: ImageView
     private lateinit var img4: ImageView
     private lateinit var img5: ImageView
+    private lateinit var uploadImage: ImageView
     private lateinit var card_add: CardView
     private lateinit var binding: ActivityMainBinding
     private lateinit var alarmManager: AlarmManager
     private lateinit var reminderBrodcast: ReminderBrodcast
     private lateinit var pendingIntent: PendingIntent
-
+    private val pickImage = 100
+    private var imageUri: Uri? = null
     var id: Long = 0
     var id1: Long = 0
     var color: String = "Blue"
@@ -82,10 +88,11 @@ class TodoAddActivity : AppCompatActivity() {
 
         submit_btn =  findViewById(R.id.submit)
         update_btn =  findViewById(R.id.update)
+        uploadImageTxt =  findViewById(R.id.uploadImageTxt)
         title = findViewById(R.id.title_txt)
         time1 = findViewById(R.id.time1)
         desc = findViewById(R.id.des_txt)
-        desc_box = findViewById(R.id.description)
+        uploadImage = findViewById(R.id.uploadImageView)
         blue_color = findViewById(R.id.blue_circle)
         yellow_color = findViewById(R.id.yellow_circle)
         red_color = findViewById(R.id.red_circle)
@@ -104,6 +111,11 @@ class TodoAddActivity : AppCompatActivity() {
             showTimePicker()
 
 
+        }
+
+        uploadImage.setOnClickListener(){
+            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+            startActivityForResult(gallery, pickImage)
         }
 
         blue_color.setOnClickListener(){
@@ -241,13 +253,13 @@ class TodoAddActivity : AppCompatActivity() {
             if (hours_alarm > 0 && min_alarm > 0){
                 scheduleNotification()
                 println("yeeeee")
-                todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),time.toString(),fulldate.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm,false))
+                todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),current.toString(),fulldate.toString(),imageUri.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm,false))
                 id = id+1
             }
             else{
 
                 println("yeeeee")
-                todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),time.toString(),fulldate.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm,false))
+                todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),current.toString(),fulldate.toString(),imageUri.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm,false))
                 id = id+1
                 intent = Intent(applicationContext, TodoActivity::class.java)
                 startActivity(intent)
@@ -258,8 +270,9 @@ class TodoAddActivity : AppCompatActivity() {
             todoDataViewModels.insertData(TodoData(id1,
                 title.text.toString(),
                 desc.text.toString(),
-                time.toString(),
+                current.toString(),
                 fulldate.toString(),
+                imageUri.toString(),
                 color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm,false))
             intent = Intent(applicationContext, TodoActivity::class.java)
             startActivity(intent)
@@ -370,6 +383,17 @@ class TodoAddActivity : AppCompatActivity() {
         println(min_alarm)
         return calendar.timeInMillis
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == pickImage) {
+            uploadImageTxt.setVisibility(View.INVISIBLE)
+            imageUri = data?.data
+            println("imageUri")
+            println(imageUri)
+            uploadImage.setImageURI(imageUri)
+        }
     }
 
     override fun onBackPressed() {

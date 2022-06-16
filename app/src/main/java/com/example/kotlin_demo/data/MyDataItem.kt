@@ -1,8 +1,11 @@
 package com.example.kotlin_demo.data
 
+import android.net.Uri
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import retrofit2.http.Url
+import java.net.URI
 
 @Entity(tableName = "apidata_table")
 data class MyDataItem(
@@ -19,6 +22,7 @@ data class TodoData(
     @ColumnInfo(name = "desc") val desc: String,
     @ColumnInfo(name = "time") val time: String,
     @ColumnInfo(name = "date") val date: String,
+    @ColumnInfo(name = "image") val image: String,
     val color: String,
     val hour: String,
     val min: String,

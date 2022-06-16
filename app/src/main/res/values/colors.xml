@@ -20,5 +20,6 @@
     <color name="Lightthemecolor">#EA9C9C</color>
     <color name="titlecolor">#424242</color>
     <color name="transperent">#7EE8E7E7</color>
+    <color name="transperent1">#00E8E7E7</color>
     <color name="toolbarcolor">#EC5454</color>
 </resources>
