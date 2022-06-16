@@ -5,8 +5,7 @@ import android.net.Uri
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -61,7 +60,13 @@ class TodoAdapter(val context: Context, val listner: TodoActivity,private val sh
         holder.alarm_time.text = ItemsViewModel.hour+" : "+ItemsViewModel.min
 
         println("imageUri")
-        println(uri.toString().length)
+        println(ItemsViewModel.title.length)
+        if (ItemsViewModel.title.length == 0){
+            holder.title.setVisibility(GONE)
+        }
+        if (ItemsViewModel.desc.length == 0){
+            holder.desc.setVisibility(GONE)
+        }
         if (uri.toString() == "null"){
             holder.thumbnail.setVisibility(View.GONE)
         }
@@ -74,10 +79,11 @@ class TodoAdapter(val context: Context, val listner: TodoActivity,private val sh
             holder.alarm_img.setVisibility(VISIBLE)
         }
         else{
-            holder.alarm_img.setVisibility(INVISIBLE)
-            holder.alarm_time.setVisibility(INVISIBLE)
+            holder.alarm_img.setVisibility(GONE)
+            holder.alarm_time.setVisibility(GONE)
 
         }
+
         if (ItemsViewModel.color.toString() == "Blue") {
             holder.card.setBackgroundResource(R.color.blue)
         }

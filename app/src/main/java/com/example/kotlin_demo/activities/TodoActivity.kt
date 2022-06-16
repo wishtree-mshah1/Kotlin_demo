@@ -158,6 +158,7 @@ class TodoActivity : AppCompatActivity() {
         intent.putExtra("id1",todoData.id)
         intent.putExtra("color",todoData.color)
         intent.putExtra("update_task","update")
+        intent.putExtra("image",todoData.image)
         startActivity(intent)
         this.finish()
     }

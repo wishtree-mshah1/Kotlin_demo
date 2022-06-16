@@ -10,7 +10,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/todo_recycler"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp"
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,12 +24,11 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
         android:contentDescription="Add Notes"
-        android:text="Add Notes"
         android:textColor="@color/white"
-        app:iconTint="@color/white"
         app:icon="@drawable/ic_baseline_notes_24"
+        app:iconTint="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/layout"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <LinearLayout
         android:id="@+id/layout"

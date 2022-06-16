@@ -7,12 +7,8 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.view.View.*
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -54,7 +50,8 @@ class TodoAddActivity : AppCompatActivity() {
     private lateinit var uploadImageTxt : TextView
     private lateinit var time1 : TextView
     private lateinit var title : TextInputEditText
-    private lateinit var desc : EditText
+    private lateinit var description : TextInputLayout
+    private lateinit var desc : TextInputEditText
     private lateinit var todoDataViewModels: TodoDataViewModels
     private lateinit var blue_color: CircleImageView
     private lateinit var yellow_color: CircleImageView
@@ -66,9 +63,12 @@ class TodoAddActivity : AppCompatActivity() {
     private lateinit var img3: ImageView
     private lateinit var img4: ImageView
     private lateinit var img5: ImageView
+    private lateinit var radio_button_1: RadioButton
+    private lateinit var radio_button_2: RadioButton
+    private lateinit var checkbox_layout: LinearLayout
+    private lateinit var radioGroup: RadioGroup
     private lateinit var uploadImage: ImageView
     private lateinit var card_add: CardView
-    private lateinit var binding: ActivityMainBinding
     private lateinit var alarmManager: AlarmManager
     private lateinit var reminderBrodcast: ReminderBrodcast
     private lateinit var pendingIntent: PendingIntent
@@ -82,13 +82,14 @@ class TodoAddActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_todo_add)
         createNotificationChannel()
 
         submit_btn =  findViewById(R.id.submit)
         update_btn =  findViewById(R.id.update)
+        description = findViewById(R.id.description)
         uploadImageTxt =  findViewById(R.id.uploadImageTxt)
+        checkbox_layout =  findViewById(R.id.checkbox_layout)
         title = findViewById(R.id.title_txt)
         time1 = findViewById(R.id.time1)
         desc = findViewById(R.id.des_txt)
@@ -104,15 +105,25 @@ class TodoAddActivity : AppCompatActivity() {
         img3 = findViewById(R.id.img3)
         img4 = findViewById(R.id.img4)
         img5 = findViewById(R.id.img5)
+        radio_button_1 = findViewById(R.id.radio_button_1)
+        radio_button_2 = findViewById(R.id.radio_button_2)
+        radioGroup = findViewById(R.id.radioGroup)
         time_text = findViewById(R.id.timepick)
 
         time_text.setOnClickListener {
-
             showTimePicker()
-
+        }
+        radio_button_1.setOnClickListener(){
+            desc.setVisibility(VISIBLE)
+            description.setVisibility(VISIBLE)
+            checkbox_layout.setVisibility(GONE)
+        }
+        radio_button_2.setOnClickListener(){
+            desc.setVisibility(GONE)
+            description.setVisibility(GONE)
+            checkbox_layout.setVisibility(VISIBLE)
 
         }
-
         uploadImage.setOnClickListener(){
             val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
             startActivityForResult(gallery, pickImage)
@@ -178,10 +189,17 @@ class TodoAddActivity : AppCompatActivity() {
             update_btn.setVisibility(VISIBLE)
             submit_btn.setVisibility(INVISIBLE)
             val title_val = intent.getStringExtra("title")
+            val image = intent.getStringExtra("image")
+            val uri: Uri = Uri.parse(image)
             val desc_val =intent.getStringExtra("desc")
             id1 = intent.getLongExtra("id1",0)
             val color1 = intent.getStringExtra("color")
             title.setText(title_val)
+            uploadImage.setImageURI(uri)
+            imageUri = uri
+            if (uri.toString() != "null"){
+                uploadImageTxt.setVisibility(INVISIBLE)
+            }
             desc.setText(desc_val)
             img1.setVisibility(INVISIBLE)
 
