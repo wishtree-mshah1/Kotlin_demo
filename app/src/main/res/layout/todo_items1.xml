@@ -35,7 +35,6 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
                     android:layout_marginTop="5dp">
 
                     <LinearLayout
@@ -92,6 +91,7 @@
                         android:layout_width="220dp"
                         android:layout_height="wrap_content"
                         android:text="Title"
+                        android:gravity="top"
                         android:textColor="@color/white"
                         android:textSize="17dp"
                         android:textStyle="italic"

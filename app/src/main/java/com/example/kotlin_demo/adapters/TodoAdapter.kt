@@ -2,6 +2,7 @@ package com.example.kotlin_demo.adapters
 
 import android.content.Context
 import android.net.Uri
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.INVISIBLE
@@ -16,6 +17,8 @@ import com.example.kotlin_demo.R
 import com.example.kotlin_demo.activities.TodoActivity
 import com.example.kotlin_demo.data.TodoData
 import com.example.kotlin_demo.viewmodels.TodoDataViewModels
+import java.text.ParseException
+import java.text.SimpleDateFormat
 
 class TodoAdapter(val context: Context, val listner: TodoActivity,private val showMenuDelete: (Boolean) -> Unit) : RecyclerView.Adapter<TodoAdapter.ViewHolder>()  {
 
@@ -51,7 +54,8 @@ class TodoAdapter(val context: Context, val listner: TodoActivity,private val sh
         holder.thumbnail.setImageURI(uri)
         holder.title.text = ItemsViewModel.title
         holder.desc.text = ItemsViewModel.desc
-        holder.time.text = ItemsViewModel.time
+        var timeAgo = calculateAgo(ItemsViewModel.time)
+        holder.time.text = timeAgo.toString()
         holder.date.text = ItemsViewModel.date
         holder.iv.visibility = View.GONE
         holder.alarm_time.text = ItemsViewModel.hour+" : "+ItemsViewModel.min
@@ -130,6 +134,20 @@ class TodoAdapter(val context: Context, val listner: TodoActivity,private val sh
             }
         }
 
+    }
+
+    private fun calculateAgo(time: String): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+        try {
+            val time: Long = sdf.parse(time).getTime()
+            val now = System.currentTimeMillis()
+            val ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.MINUTE_IN_MILLIS)
+            println(ago)
+            return ago.toString()+""
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+        return ""
     }
 
     private fun selectItem(holder: TodoAdapter.ViewHolder, itemsViewModel: TodoData, position: Int) {
