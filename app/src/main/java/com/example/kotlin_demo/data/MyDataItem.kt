@@ -1,9 +1,7 @@
 package com.example.kotlin_demo.data
 
 import android.net.Uri
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 import retrofit2.http.Url
 import java.net.URI
 
@@ -28,6 +26,20 @@ data class TodoData(
     val min: String,
     val ampm: String,
     var selected: Boolean,
-
-
 )
+
+@Entity(tableName = "task_table",
+
+        foreignKeys = arrayOf(ForeignKey(
+            entity = TodoData::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("todo_id"),
+            onDelete = ForeignKey.CASCADE
+
+        ))
+)
+data class Temp(
+    @ColumnInfo val todo_id: Long,
+    @PrimaryKey(autoGenerate = true) val task_id: Long,
+    @ColumnInfo(name = "title") val title: String,
+    @ColumnInfo(name = "isselected") val isselected: Boolean)

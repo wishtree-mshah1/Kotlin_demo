@@ -14,12 +14,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlin_demo.R
+import com.example.kotlin_demo.adapters.CheckboxAdapter
+import com.example.kotlin_demo.data.TaskDatabase
+import com.example.kotlin_demo.data.Temp
 import com.example.kotlin_demo.data.TodoData
-import com.example.kotlin_demo.data.TodoDatabase
-import com.example.kotlin_demo.databinding.ActivityMainBinding
 import com.example.kotlin_demo.notification.*
+import com.example.kotlin_demo.repo.TaskDataRepository
 import com.example.kotlin_demo.repo.TodoDataRepository
+import com.example.kotlin_demo.viewmodels.TaskDataVMFactory
+import com.example.kotlin_demo.viewmodels.TaskViewModels
 import com.example.kotlin_demo.viewmodels.TodoDataVMFactory
 import com.example.kotlin_demo.viewmodels.TodoDataViewModels
 import com.google.android.material.textfield.TextInputEditText
@@ -36,6 +42,9 @@ class TodoAddActivity : AppCompatActivity() {
     lateinit var previewSelectedTimeTextView: TextView
     lateinit var picker: MaterialTimePicker
     private lateinit var calender:Calendar
+    var layout_id = 0
+    var check_id = 1000
+    var edt_id = 10000
     var hours_alarm = 0
     var min_alarm = 0
     var ampm_alarm:String = "am"
@@ -49,33 +58,43 @@ class TodoAddActivity : AppCompatActivity() {
     private lateinit var time_text : TextView
     private lateinit var uploadImageTxt : TextView
     private lateinit var time1 : TextView
+    private lateinit var layout_checkbox : LinearLayout
+    private lateinit var layout_checkbox1 : LinearLayout
     private lateinit var title : TextInputEditText
     private lateinit var description : TextInputLayout
     private lateinit var desc : TextInputEditText
     private lateinit var todoDataViewModels: TodoDataViewModels
+    private lateinit var taskViewModels: TaskViewModels
     private lateinit var blue_color: CircleImageView
     private lateinit var yellow_color: CircleImageView
     private lateinit var red_color: CircleImageView
     private lateinit var black_color: CircleImageView
     private lateinit var pink_color: CircleImageView
+    //private lateinit var add_check: Button
     private lateinit var img1: ImageView
     private lateinit var img2: ImageView
     private lateinit var img3: ImageView
     private lateinit var img4: ImageView
+    private lateinit var recyclerview_check: RecyclerView
     private lateinit var img5: ImageView
     private lateinit var radio_button_1: RadioButton
     private lateinit var radio_button_2: RadioButton
-    private lateinit var checkbox_layout: LinearLayout
+    //private lateinit var checkbox_layout: LinearLayout
     private lateinit var radioGroup: RadioGroup
     private lateinit var uploadImage: ImageView
     private lateinit var card_add: CardView
     private lateinit var alarmManager: AlarmManager
-    private lateinit var reminderBrodcast: ReminderBrodcast
+    private lateinit var layout : LinearLayout
+    private lateinit var checkbox_check: CheckBox
+    private lateinit var edt_check1: EditText
+    public lateinit var edt_check: EditText
+    private lateinit var adapter: CheckboxAdapter
     private lateinit var pendingIntent: PendingIntent
     private val pickImage = 100
     private var imageUri: Uri? = null
-    var id: Long = 0
+    var id: Long = getTime()
     var id1: Long = 0
+    var id_check: Long = 0
     var color: String = "Blue"
 
 
@@ -89,8 +108,10 @@ class TodoAddActivity : AppCompatActivity() {
         update_btn =  findViewById(R.id.update)
         description = findViewById(R.id.description)
         uploadImageTxt =  findViewById(R.id.uploadImageTxt)
-        checkbox_layout =  findViewById(R.id.checkbox_layout)
+        //add_check =  findViewById(R.id.add_check)
         title = findViewById(R.id.title_txt)
+        layout_checkbox = findViewById(R.id.layout_checkbox)
+        //layout_checkbox1 = findViewById(R.id.layout_checkbox1)
         time1 = findViewById(R.id.time1)
         desc = findViewById(R.id.des_txt)
         uploadImage = findViewById(R.id.uploadImageView)
@@ -109,6 +130,43 @@ class TodoAddActivity : AppCompatActivity() {
         radio_button_2 = findViewById(R.id.radio_button_2)
         radioGroup = findViewById(R.id.radioGroup)
         time_text = findViewById(R.id.timepick)
+        //edt_check1 = findViewById(R.id.checkbox_edt1)
+        var view = layoutInflater.inflate(R.layout.checkbox_task, null, false)
+        layout = view.findViewById(R.id.layout_check)
+        edt_check = view.findViewById(R.id.checkbox_edt)
+
+
+        recyclerview_check = findViewById(R.id.recyclerview_check)
+        recyclerview_check.layoutManager = LinearLayoutManager(this)
+        adapter = CheckboxAdapter(this)
+        recyclerview_check.adapter = adapter
+
+        val dao = TaskDatabase.getDatabase(applicationContext).getTodoDataDao()
+        val repository = TodoDataRepository(dao)
+        todoDataViewModels = ViewModelProvider(this, TodoDataVMFactory(repository)).get(TodoDataViewModels::class.java)
+        todoDataViewModels.allData.observe(this, Observer {
+
+        })
+
+        val dao1 = TaskDatabase.getDatabase(applicationContext).getTaskDataDao()
+        val repository1 = TaskDataRepository(dao1)
+        taskViewModels = ViewModelProvider(this,TaskDataVMFactory(repository1)).get(TaskViewModels::class.java)
+        taskViewModels.allData1.observe(this, Observer {
+        })
+
+        val taskType = intent.getStringExtra("update_task")
+
+        if(taskType.equals("update")){
+
+        }
+        else{
+            todoDataViewModels.insertData(TodoData(id,"","","","","","","","","",false))
+
+        }
+
+        layout.setOnClickListener(){
+            println("okkkkkkk")
+        }
 
         time_text.setOnClickListener {
             showTimePicker()
@@ -116,12 +174,21 @@ class TodoAddActivity : AppCompatActivity() {
         radio_button_1.setOnClickListener(){
             desc.setVisibility(VISIBLE)
             description.setVisibility(VISIBLE)
-            checkbox_layout.setVisibility(GONE)
+//           checkbox_layout.setVisibility(GONE)
+            layout_checkbox.setVisibility(VISIBLE)
+
         }
         radio_button_2.setOnClickListener(){
+            taskViewModels.insertData(Temp(id,id_check,"ddfdfdf",true))
+            id_check = id_check+1
+            adapter.notifyDataSetChanged()
+
             desc.setVisibility(GONE)
             description.setVisibility(GONE)
-            checkbox_layout.setVisibility(VISIBLE)
+//            layout_checkbox1.setVisibility(VISIBLE)
+            layout_checkbox.setVisibility(VISIBLE)
+            //layout_checkbox.addView(view)
+            recyclerview_check.setVisibility(VISIBLE)
 
         }
         uploadImage.setOnClickListener(){
@@ -175,14 +242,6 @@ class TodoAddActivity : AppCompatActivity() {
             img1.setVisibility(INVISIBLE)
         }
 
-        val dao = TodoDatabase.getDatabase(applicationContext).getTodoDataDao()
-        val repository = TodoDataRepository(dao)
-        todoDataViewModels = ViewModelProvider(this, TodoDataVMFactory(repository)).get(TodoDataViewModels::class.java)
-        todoDataViewModels.allData.observe(this, Observer {
-
-        })
-
-        val taskType = intent.getStringExtra("update_task")
 
         if (taskType.equals("update"))
         {
@@ -264,7 +323,11 @@ class TodoAddActivity : AppCompatActivity() {
 
         submit_btn.setOnClickListener(){
 
+            println("edt_check.text")
+            println(edt_check.text)
+            println("edt_check.text")
 
+            //println(checkbox_check.isChecked)
             intent.putExtra("titleExtra", title.text.toString())
             intent.putExtra("messageExtra", desc.text.toString())
 
@@ -272,13 +335,12 @@ class TodoAddActivity : AppCompatActivity() {
                 scheduleNotification()
                 println("yeeeee")
                 todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),current.toString(),fulldate.toString(),imageUri.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm,false))
-                id = id+1
+//                id = id+1
             }
             else{
-
                 println("yeeeee")
                 todoDataViewModels.insertData(TodoData(id,title.text.toString(),desc.text.toString(),current.toString(),fulldate.toString(),imageUri.toString(),color.toString(),hours_alarm.toString(),min_alarm.toString(),ampm_alarm,false))
-                id = id+1
+//                id = id+1
                 intent = Intent(applicationContext, TodoActivity::class.java)
                 startActivity(intent)
             }
@@ -356,17 +418,6 @@ class TodoAddActivity : AppCompatActivity() {
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
-//        val name = "Notif Channel"
-//        val desc = "A Description of the Channel"
-//        val importance = NotificationManager.IMPORTANCE_DEFAULT
-//        val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            NotificationChannel(channelID, name, importance)
-//        } else {
-//            TODO("VERSION.SDK_INT < O")
-//        }
-//        channel.description = desc
-//        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-//        notificationManager.createNotificationChannel(channel)
     }
 
     private fun showAlert(title: String, time: Date, message: String) {

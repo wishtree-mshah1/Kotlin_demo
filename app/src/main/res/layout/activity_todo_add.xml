@@ -9,13 +9,12 @@
         android:id="@+id/card_add"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="30dp"
-        android:layout_marginVertical="50dp"
         app:cardCornerRadius="10dp"
+        android:layout_margin="10dp"
         app:cardBackgroundColor="@color/blue">
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+<!--        <ScrollView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent">-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -78,7 +77,7 @@
                     android:layout_width="match_parent"
                     android:layout_marginRight="15dp"
                     android:layout_marginLeft="15dp"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -156,60 +155,23 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <LinearLayout
+                        android:id="@+id/layout_checkbox"
                         android:paddingBottom="20dp"
                         android:layout_marginRight="10dp"
                         android:layout_marginLeft="10dp"
-                        android:visibility="gone"
                         android:orientation="vertical"
-                        android:id="@+id/checkbox_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="300dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
-
-                        <LinearLayout
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recyclerview_check"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <CheckBox
-                                android:buttonTint="@color/white"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/white"/>
-                            <EditText
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <CheckBox
-                                android:buttonTint="@color/white"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/white"/>
-                            <EditText
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <CheckBox
-                                android:buttonTint="@color/white"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/white"/>
-                            <EditText
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
-                        </LinearLayout>
-
+                            android:layout_height="match_parent"
+                            android:background="@color/black"
+                            tools:listitem="@layout/checkbox_task" />
                     </LinearLayout>
-
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
@@ -454,7 +416,7 @@
 
         </LinearLayout>
 
-        </ScrollView>
+<!--        </ScrollView>-->
 
     </androidx.cardview.widget.CardView>
 

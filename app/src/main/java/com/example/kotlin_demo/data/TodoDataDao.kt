@@ -9,6 +9,9 @@ interface TodoDataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(todoData: TodoData)
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun update(todoData: TodoData)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(todoData: TodoData)
 

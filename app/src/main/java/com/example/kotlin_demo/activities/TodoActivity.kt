@@ -16,11 +16,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlin_demo.R
 import com.example.kotlin_demo.adapters.TodoAdapter
+import com.example.kotlin_demo.data.TaskDatabase
 import com.example.kotlin_demo.data.TodoData
-import com.example.kotlin_demo.data.TodoDatabase
 import com.example.kotlin_demo.databinding.ActivityMainBinding
 import com.example.kotlin_demo.notification.channelID
+import com.example.kotlin_demo.repo.TaskDataRepository
 import com.example.kotlin_demo.repo.TodoDataRepository
+import com.example.kotlin_demo.viewmodels.TaskDataVMFactory
+import com.example.kotlin_demo.viewmodels.TaskViewModels
 import com.example.kotlin_demo.viewmodels.TodoDataVMFactory
 import com.example.kotlin_demo.viewmodels.TodoDataViewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -36,6 +39,7 @@ class TodoActivity : AppCompatActivity() {
     lateinit var bottom_nav: BottomNavigationView
     lateinit var floating_btn: ExtendedFloatingActionButton
     private lateinit var todoDataViewModels: TodoDataViewModels
+    private lateinit var taskViewModels: TaskViewModels
     private var mainMenu: Menu? = null
     private lateinit var adapter: TodoAdapter
 
@@ -63,7 +67,21 @@ class TodoActivity : AppCompatActivity() {
         adapter = TodoAdapter(this,this){show -> showDeleteMenu(show)}
         recyclerview.adapter = adapter
 
-        val dao = TodoDatabase.getDatabase(applicationContext).getTodoDataDao()
+
+//        val dao11 = TodoDatabase.getDatabase(applicationContext).getTodoDataDao()
+//        val repository11 = TodoDataRepository(dao11)
+//        todoDataViewModels = ViewModelProvider(this, TodoDataVMFactory(repository11)).get(TodoDataViewModels::class.java)
+//        todoDataViewModels.allData.observe(this, Observer {
+//        })
+        val dao1 = TaskDatabase.getDatabase(applicationContext).getTaskDataDao()
+        val repository1 = TaskDataRepository(dao1)
+        taskViewModels = ViewModelProvider(this,
+            TaskDataVMFactory(repository1)).get(TaskViewModels::class.java)
+        taskViewModels.allData1.observe(this, Observer {
+        })
+
+
+        val dao = TaskDatabase.getDatabase(applicationContext).getTodoDataDao()
         val repository = TodoDataRepository(dao)
         todoDataViewModels = ViewModelProvider(this, TodoDataVMFactory(repository)).get(
             TodoDataViewModels::class.java)

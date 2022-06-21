@@ -40,7 +40,6 @@ class TodoAdapter(val context: Context, val listner: TodoActivity,private val sh
             listner.onItemClick(allNotes[view.adapterPosition])
         }
 
-
         return view
     }
 
@@ -75,9 +74,10 @@ class TodoAdapter(val context: Context, val listner: TodoActivity,private val sh
 
         }
 
-        if (ItemsViewModel.hour.toInt() != 0){
+        if (ItemsViewModel.hour != "0"){
             holder.alarm_img.setVisibility(VISIBLE)
         }
+
         else{
             holder.alarm_img.setVisibility(GONE)
             holder.alarm_time.setVisibility(GONE)

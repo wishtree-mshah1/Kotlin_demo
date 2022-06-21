@@ -23,8 +23,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlin_demo.R
 import com.example.kotlin_demo.adapters.MyAdapter
-import com.example.kotlin_demo.data.ApiDatabase
 import com.example.kotlin_demo.data.MyDataItem
+import com.example.kotlin_demo.data.TaskDatabase
 import com.example.kotlin_demo.data.UserDao
 import com.example.kotlin_demo.interfaces.ApiInterface
 import com.example.kotlin_demo.repo.APiDataRepository
@@ -84,7 +84,7 @@ class HomeActivity : AppCompatActivity() {
 
         doNetworkCalls(_start, _limit, view, layout)
 
-        val dao = ApiDatabase.getDatabase(applicationContext).getApiDataDao()
+        val dao = TaskDatabase.getDatabase(applicationContext).getApiDataDao()
         val repository = APiDataRepository(dao)
         apiDataViewModels = ViewModelProvider(this,ApiDataVMFactory(repository)).get(ApiDataViewModels::class.java)
         apiDataViewModels.allData.observe(this, Observer {
@@ -130,12 +130,9 @@ class HomeActivity : AppCompatActivity() {
                     //progressBar.setVisibility(View.VISIBLE)
 
                 }
-
-
             }
         })
-
-        }
+    }
 
     private fun showDetails() {
         try {
@@ -243,7 +240,6 @@ class HomeActivity : AppCompatActivity() {
 
                 else{
                     layout.removeView(view)
-
                 }
             }
         }

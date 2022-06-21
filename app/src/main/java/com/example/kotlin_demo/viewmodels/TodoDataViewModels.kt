@@ -19,6 +19,12 @@ class TodoDataViewModels(private val repository: TodoDataRepository): ViewModel(
         }
     }
 
+    fun updateData(todoData: TodoData){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.update(todoData)
+        }
+    }
+
     fun deleteData(todoData: TodoData){
         viewModelScope.launch(Dispatchers.IO) {
             repository.delete(todoData)
