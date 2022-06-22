@@ -15,7 +15,9 @@
             android:layout_height="wrap_content"
             android:textColor="@color/white"/>
         <EditText
+            android:textColor="@color/white"
             android:id="@+id/checkbox_edt"
+            android:imeOptions="actionDone"
             android:inputType="text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

@@ -1,8 +1,7 @@
 package com.example.kotlin_demo.data
 
-import android.net.Uri
+import android.widget.CheckBox
 import androidx.room.*
-import retrofit2.http.Url
 import java.net.URI
 
 @Entity(tableName = "apidata_table")
@@ -42,4 +41,5 @@ data class Temp(
     @ColumnInfo val todo_id: Long,
     @PrimaryKey(autoGenerate = true) val task_id: Long,
     @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "isselected") val isselected: Boolean)
+    @ColumnInfo(name = "isselected") val isselected: Boolean
+)

@@ -12,9 +12,9 @@
         app:cardCornerRadius="10dp"
         android:layout_margin="10dp"
         app:cardBackgroundColor="@color/blue">
-<!--        <ScrollView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent">-->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -80,8 +80,11 @@
                     android:layout_height="match_parent">
 
                     <TextView
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="12dp"
                         android:id="@+id/textView2"
+                        android:layout_marginLeft="5dp"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Input type"
@@ -91,6 +94,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <LinearLayout
+                        android:layout_marginTop="10dp"
                         android:id="@+id/linearLayout3"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -161,15 +165,14 @@
                         android:layout_marginLeft="10dp"
                         android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
+                        android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerview_check"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@color/black"
+                            android:layout_height="wrap_content"
                             tools:listitem="@layout/checkbox_task" />
                     </LinearLayout>
 
@@ -416,7 +419,7 @@
 
         </LinearLayout>
 
-<!--        </ScrollView>-->
+        </ScrollView>
 
     </androidx.cardview.widget.CardView>
 

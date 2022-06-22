@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
 import android.view.View
 import android.view.View.*
 import android.widget.*
@@ -21,7 +22,7 @@ import com.example.kotlin_demo.adapters.CheckboxAdapter
 import com.example.kotlin_demo.data.TaskDatabase
 import com.example.kotlin_demo.data.Temp
 import com.example.kotlin_demo.data.TodoData
-import com.example.kotlin_demo.notification.*
+import com.example.kotlin_demo.notification.ReminderBrodcast
 import com.example.kotlin_demo.repo.TaskDataRepository
 import com.example.kotlin_demo.repo.TodoDataRepository
 import com.example.kotlin_demo.viewmodels.TaskDataVMFactory
@@ -86,8 +87,8 @@ class TodoAddActivity : AppCompatActivity() {
     private lateinit var alarmManager: AlarmManager
     private lateinit var layout : LinearLayout
     private lateinit var checkbox_check: CheckBox
-    private lateinit var edt_check1: EditText
-    public lateinit var edt_check: EditText
+    private lateinit var checkbox_edt: EditText
+    private lateinit var edt_check: EditText
     private lateinit var adapter: CheckboxAdapter
     private lateinit var pendingIntent: PendingIntent
     private val pickImage = 100
@@ -96,6 +97,7 @@ class TodoAddActivity : AppCompatActivity() {
     var id1: Long = 0
     var id_check: Long = 0
     var color: String = "Blue"
+    var tempp = 0
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -130,22 +132,26 @@ class TodoAddActivity : AppCompatActivity() {
         radio_button_2 = findViewById(R.id.radio_button_2)
         radioGroup = findViewById(R.id.radioGroup)
         time_text = findViewById(R.id.timepick)
-        //edt_check1 = findViewById(R.id.checkbox_edt1)
         var view = layoutInflater.inflate(R.layout.checkbox_task, null, false)
         layout = view.findViewById(R.id.layout_check)
-        edt_check = view.findViewById(R.id.checkbox_edt)
+
 
 
         recyclerview_check = findViewById(R.id.recyclerview_check)
         recyclerview_check.layoutManager = LinearLayoutManager(this)
-        adapter = CheckboxAdapter(this)
+        adapter = CheckboxAdapter(this, this)
         recyclerview_check.adapter = adapter
+
+
+
+
+
+
 
         val dao = TaskDatabase.getDatabase(applicationContext).getTodoDataDao()
         val repository = TodoDataRepository(dao)
         todoDataViewModels = ViewModelProvider(this, TodoDataVMFactory(repository)).get(TodoDataViewModels::class.java)
         todoDataViewModels.allData.observe(this, Observer {
-
         })
 
         val dao1 = TaskDatabase.getDatabase(applicationContext).getTaskDataDao()
@@ -161,7 +167,7 @@ class TodoAddActivity : AppCompatActivity() {
         }
         else{
             todoDataViewModels.insertData(TodoData(id,"","","","","","","","","",false))
-
+            taskViewModels.insertData(Temp(id,id_check,"",false))
         }
 
         layout.setOnClickListener(){
@@ -174,15 +180,20 @@ class TodoAddActivity : AppCompatActivity() {
         radio_button_1.setOnClickListener(){
             desc.setVisibility(VISIBLE)
             description.setVisibility(VISIBLE)
-//           checkbox_layout.setVisibility(GONE)
-            layout_checkbox.setVisibility(VISIBLE)
+            layout_checkbox.setVisibility(GONE)
 
         }
+        edt_check = view.findViewById(R.id.checkbox_edt)
+        checkbox_check = view.findViewById(R.id.checkbox_check)
+
         radio_button_2.setOnClickListener(){
-            taskViewModels.insertData(Temp(id,id_check,"ddfdfdf",true))
-            id_check = id_check+1
+
+            taskViewModels.allData1.observe(this, Observer {
+                adapter.updateTempData(it)
+            })
             adapter.notifyDataSetChanged()
 
+            tempp = tempp+1
             desc.setVisibility(GONE)
             description.setVisibility(GONE)
 //            layout_checkbox1.setVisibility(VISIBLE)
@@ -191,6 +202,9 @@ class TodoAddActivity : AppCompatActivity() {
             recyclerview_check.setVisibility(VISIBLE)
 
         }
+
+
+
         uploadImage.setOnClickListener(){
             val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
             startActivityForResult(gallery, pickImage)
@@ -359,6 +373,8 @@ class TodoAddActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun showTimePicker() {
 
         val picker =
@@ -472,5 +488,13 @@ class TodoAddActivity : AppCompatActivity() {
 
     private fun concat(hours: Int, minutes: Int): String? {
         return hours.toString() +":"+ minutes.toString()
+    }
+
+    fun setClick(title: Editable, check_status: Boolean) {
+
+        var idd = id_check-1
+        taskViewModels.insertData(Temp(id,idd,title.toString(),check_status))
+
+
     }
 }
